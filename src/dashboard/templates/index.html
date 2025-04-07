@@ -1,0 +1,77 @@
+<!-- dashboard/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Telemetry Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.11.4/chartist.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="dashboard">
+        <header>
+            <h1><i class="fas fa-satellite"></i> Space Telemetry Dashboard</h1>
+            <div class="spacecraft-info">
+                <span>Spacecraft: </span>
+                <span id="spacecraft-id">-</span>
+            </div>
+        </header>
+        
+        <div class="metrics-container">
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-mountain"></i>
+                </div>
+                <div class="metric-data">
+                    <h3>Altitude</h3>
+                    <div class="metric-value" id="altitude">- km</div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div class="metric-data">
+                    <h3>Velocity</h3>
+                    <div class="metric-value" id="velocity">- m/s</div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-thermometer-half"></i>
+                </div>
+                <div class="metric-data">
+                    <h3>Temperature</h3>
+                    <div class="metric-value" id="temperature">- °C</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3>Velocity Over Time</h3>
+                <div class="chart" id="velocity-chart"></div>
+            </div>
+            <div class="chart-card">
+                <h3>Temperature Over Time</h3>
+                <div class="chart" id="temperature-chart"></div>
+            </div>
+        </div>
+        
+        <div class="position-container">
+            <h3>Spacecraft Position</h3>
+            <div id="position-visualization">
+                <canvas id="position-canvas" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.11.4/chartist.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

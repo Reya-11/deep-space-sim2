@@ -1,0 +1,147 @@
+/* dashboard/static/css/style.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #0f1631;
+    color: #e4e4e4;
+}
+
+.dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #2a3a7c;
+}
+
+header h1 {
+    color: #7dbcff;
+}
+
+.spacecraft-info {
+    background-color: #1a2659;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 1.1em;
+}
+
+/* Metrics Cards */
+.metrics-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    background-color: #1a2659;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+}
+
+.metric-icon {
+    font-size: 2em;
+    margin-right: 20px;
+    color: #7dbcff;
+}
+
+.metric-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* Charts */
+.charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.chart-card {
+    background-color: #1a2659;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.chart-card h3 {
+    margin-bottom: 15px;
+    color: #7dbcff;
+}
+
+.chart {
+    height: 250px;
+}
+
+/* Position Visualization */
+.position-container {
+    background-color: #1a2659;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.position-container h3 {
+    margin-bottom: 15px;
+    color: #7dbcff;
+}
+
+#position-visualization {
+    display: flex;
+    justify-content: center;
+    height: 400px;
+}
+
+/* Chartist Customization */
+.ct-series-a .ct-line {
+    stroke: #00bcd4;
+    stroke-width: 2px;
+}
+
+.ct-series-a .ct-point {
+    stroke: #00bcd4;
+    stroke-width: 6px;
+}
+
+.ct-series-b .ct-line {
+    stroke: #ff9800;
+    stroke-width: 2px;
+}
+
+.ct-series-b .ct-point {
+    stroke: #ff9800;
+    stroke-width: 6px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .charts-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .metrics-container {
+        grid-template-columns: 1fr;
+    }
+}

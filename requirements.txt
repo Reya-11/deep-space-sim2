@@ -1,0 +1,8 @@
+grpcio
+grpcio-tools
+websockets
+numpy
+matplotlib
+flask
+flask-socketio
+protobuf
