@@ -21,7 +21,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 1px solid #2a3a7c;
 }
@@ -35,12 +35,69 @@ header h1 {
     padding: 10px 15px;
     border-radius: 8px;
     font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-indicator {
+    font-size: 1.2em;
+}
+
+.status-text {
+    font-weight: bold;
+}
+
+/* Mission Status */
+.mission-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: #1a2659;
+    border-radius: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.mode-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mode-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 5px;
+    background-color: #2a3a7c;
+    color: #ffffff;
+    margin-top: 5px;
+    letter-spacing: 1px;
+}
+
+.signal-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.signal-delay, .bandwidth-mode {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.signal-delay i, .bandwidth-mode i {
+    color: #7dbcff;
 }
 
 /* Metrics Cards */
 .metrics-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
 }
@@ -65,10 +122,35 @@ header h1 {
     color: #7dbcff;
 }
 
+.metric-data {
+    flex: 1;
+}
+
 .metric-value {
     font-size: 1.5em;
     font-weight: bold;
     margin-top: 5px;
+}
+
+/* Energy level progress bar */
+.energy-level-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.progress-bar {
+    background-color: #2a3a7c;
+    height: 10px;
+    border-radius: 5px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background-color: #4caf50;
+    transition: width 0.3s ease;
 }
 
 /* Charts */
@@ -95,6 +177,13 @@ header h1 {
     height: 250px;
 }
 
+/* Mission Control and Position */
+.mission-control-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+}
+
 /* Position Visualization */
 .position-container {
     background-color: #1a2659;
@@ -112,6 +201,103 @@ header h1 {
     display: flex;
     justify-content: center;
     height: 400px;
+}
+
+.coordinates {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+    font-family: monospace;
+    font-size: 1.1em;
+}
+
+/* Command Log */
+.commands-log {
+    background-color: #1a2659;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.commands-log h3 {
+    margin-bottom: 15px;
+    color: #7dbcff;
+}
+
+.log-container {
+    background-color: #0f1631;
+    border-radius: 5px;
+    padding: 10px;
+    height: 380px;
+    overflow-y: auto;
+    font-family: monospace;
+    line-height: 1.5;
+}
+
+.log-entry {
+    margin-bottom: 8px;
+    border-left: 3px solid #7dbcff;
+    padding-left: 10px;
+}
+
+.log-entry.command {
+    border-left-color: #ff9800;
+}
+
+.log-entry.alert {
+    border-left-color: #ff4d4d;
+}
+
+.timestamp {
+    color: #7dbcff;
+    margin-right: 10px;
+}
+
+/* Alert levels */
+.status-text.NOMINAL {
+    color: #4caf50;
+}
+
+.status-text.WARNING {
+    color: #ff9800;
+}
+
+.status-text.CRITICAL {
+    color: #ff4d4d;
+}
+
+.status-indicator.NOMINAL {
+    color: #4caf50;
+}
+
+.status-indicator.WARNING {
+    color: #ff9800;
+}
+
+.status-indicator.CRITICAL {
+    color: #ff4d4d;
+}
+
+/* Spacecraft modes */
+.mode-value.NORMAL {
+    background-color: #2a3a7c;
+}
+
+.mode-value.SAFE {
+    background-color: #ff4d4d;
+}
+
+.mode-value.SCIENCE {
+    background-color: #4caf50;
+}
+
+.mode-value.COMMS {
+    background-color: #ff9800;
+}
+
+.mode-value.MAINTENANCE {
+    background-color: #9c27b0;
 }
 
 /* Chartist Customization */
@@ -137,11 +323,18 @@ header h1 {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .charts-container {
+    .charts-container, 
+    .metrics-container,
+    .mission-control-container {
         grid-template-columns: 1fr;
     }
     
-    .metrics-container {
-        grid-template-columns: 1fr;
+    .mission-status {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .signal-info {
+        align-items: center;
     }
 }

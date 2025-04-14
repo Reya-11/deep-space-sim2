@@ -26,7 +26,8 @@ if _version_not_supported:
 
 
 class TelemetryServiceStub(object):
-    """Missing associated documentation comment in .proto file."""
+    """Telemetry service definition
+    """
 
     def __init__(self, channel):
         """Constructor.
@@ -35,14 +36,15 @@ class TelemetryServiceStub(object):
             channel: A grpc.Channel.
         """
         self.SendTelemetry = channel.unary_unary(
-                '/telemetry.TelemetryService/SendTelemetry',
+                '/space_telemetry.TelemetryService/SendTelemetry',
                 request_serializer=space__telemetry__pb2.TelemetryData.SerializeToString,
                 response_deserializer=space__telemetry__pb2.TelemetryResponse.FromString,
                 _registered_method=True)
 
 
 class TelemetryServiceServicer(object):
-    """Missing associated documentation comment in .proto file."""
+    """Telemetry service definition
+    """
 
     def SendTelemetry(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -60,14 +62,15 @@ def add_TelemetryServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'telemetry.TelemetryService', rpc_method_handlers)
+            'space_telemetry.TelemetryService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('telemetry.TelemetryService', rpc_method_handlers)
+    server.add_registered_method_handlers('space_telemetry.TelemetryService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
 class TelemetryService(object):
-    """Missing associated documentation comment in .proto file."""
+    """Telemetry service definition
+    """
 
     @staticmethod
     def SendTelemetry(request,
@@ -83,7 +86,7 @@ class TelemetryService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/telemetry.TelemetryService/SendTelemetry',
+            '/space_telemetry.TelemetryService/SendTelemetry',
             space__telemetry__pb2.TelemetryData.SerializeToString,
             space__telemetry__pb2.TelemetryResponse.FromString,
             options,

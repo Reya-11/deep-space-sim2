@@ -12,13 +12,36 @@
 <body>
     <div class="dashboard">
         <header>
-            <h1><i class="fas fa-satellite"></i> Space Telemetry Dashboard</h1>
+            <h1><i class="fas fa-satellite"></i> Deep Space Mission Control</h1>
             <div class="spacecraft-info">
                 <span>Spacecraft: </span>
                 <span id="spacecraft-id">-</span>
+                <span class="status-indicator" id="status-indicator">●</span>
+                <span class="status-text" id="alert-level">NOMINAL</span>
             </div>
         </header>
         
+        <!-- Mission Status Section -->
+        <div class="mission-status">
+            <div class="mode-card">
+                <h3>Spacecraft Mode</h3>
+                <div class="mode-value" id="spacecraft-mode">NORMAL</div>
+            </div>
+            <div class="signal-info">
+                <div class="signal-delay">
+                    <i class="fas fa-stopwatch"></i>
+                    <span>Signal Delay: </span>
+                    <span id="signal-delay">- s</span>
+                </div>
+                <div class="bandwidth-mode">
+                    <i class="fas fa-wifi"></i>
+                    <span>Bandwidth: </span>
+                    <span id="bandwidth-mode">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Primary Metrics -->
         <div class="metrics-container">
             <div class="metric-card">
                 <div class="metric-icon">
@@ -49,8 +72,34 @@
                     <div class="metric-value" id="temperature">- °C</div>
                 </div>
             </div>
+            
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-radiation"></i>
+                </div>
+                <div class="metric-data">
+                    <h3>Radiation</h3>
+                    <div class="metric-value" id="radiation">- units</div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-battery-half"></i>
+                </div>
+                <div class="metric-data">
+                    <h3>Energy</h3>
+                    <div class="energy-level-container">
+                        <div class="metric-value" id="energy">-%</div>
+                        <div class="progress-bar">
+                            <div class="progress" id="energy-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
+        <!-- Charts -->
         <div class="charts-container">
             <div class="chart-card">
                 <h3>Velocity Over Time</h3>
@@ -62,10 +111,37 @@
             </div>
         </div>
         
-        <div class="position-container">
-            <h3>Spacecraft Position</h3>
-            <div id="position-visualization">
-                <canvas id="position-canvas" width="400" height="400"></canvas>
+        <!-- Second row of charts -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3>Energy Level Over Time</h3>
+                <div class="chart" id="energy-chart"></div>
+            </div>
+            <div class="chart-card">
+                <h3>Radiation Level Over Time</h3>
+                <div class="chart" id="radiation-chart"></div>
+            </div>
+        </div>
+        
+        <!-- Mission Control and Position -->
+        <div class="mission-control-container">
+            <div class="commands-log">
+                <h3>Mission Control Log</h3>
+                <div class="log-container" id="command-log">
+                    <!-- Commands will be added dynamically -->
+                </div>
+            </div>
+            
+            <div class="position-container">
+                <h3>Spacecraft Position</h3>
+                <div id="position-visualization">
+                    <canvas id="position-canvas" width="400" height="400"></canvas>
+                </div>
+                <div class="coordinates">
+                    <span>X: <span id="pos-x">-</span></span>
+                    <span>Y: <span id="pos-y">-</span></span>
+                    <span>Z: <span id="pos-z">-</span></span>
+                </div>
             </div>
         </div>
     </div>

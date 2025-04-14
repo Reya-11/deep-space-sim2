@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package space_telemetry;
+
+// Telemetry data message
+message TelemetryData {
+  string spacecraft_id = 1;
+  double timestamp = 2;
+  double position_x = 3;
+  double position_y = 4;
+  double position_z = 5;
+  double velocity_x = 6;
+  double velocity_y = 7;
+  double velocity_z = 8;
+  double temperature = 9;
+  
+  // New fields for enhanced simulation
+  double radiation_level = 10;
+  double energy_level = 11;
+  string mode = 12;          // NORMAL, SAFE, SCIENCE, COMMS, MAINTENANCE
+  string alert_level = 13;   // NOMINAL, WARNING, CRITICAL
+}
+
+// Command message from edge to spacecraft
+message Command {
+  string spacecraft_id = 1;
+  string command_type = 2;   // MODE_CHANGE, TRAJECTORY_ADJUST, POWER_MANAGEMENT, etc.
+  map<string, string> parameters = 3;  // Flexible parameters for different commands
+  double timestamp = 4;
+}
+
+// Response message
+message TelemetryResponse {
+  string status = 1;
+  string message = 2;
+  repeated Command commands = 3;  // Commands to be executed by spacecraft
+}
+
+// Telemetry service definition
+service TelemetryService {
+  rpc SendTelemetry (TelemetryData) returns (TelemetryResponse) {}
+}
