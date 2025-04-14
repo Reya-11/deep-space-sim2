@@ -1,10 +1,11 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 from flask_socketio import SocketIO
 import json
 import threading
 import time
 import socket
 import datetime
+import math
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.config['SECRET_KEY'] = 'space-telemetry-secret'
@@ -12,11 +13,19 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Store recent telemetry for new connections
 recent_telemetry = []
-MAX_HISTORY = 50
+MAX_HISTORY = 100  # Increased to store more history
 
 # Store log entries on server side
 mission_log = []
-MAX_LOG_ENTRIES = 100
+MAX_LOG_ENTRIES = 200  # Increased for better history
+
+# Add session persistence
+@app.before_request
+def ensure_session_data():
+    """Initialize session data if not present"""
+    if 'visited' not in session:
+        session['visited'] = True
+        session['first_visit'] = datetime.datetime.now().isoformat()
 
 def add_to_mission_log(message, type='info'):
     """Add an entry to the server-side mission log"""
@@ -117,6 +126,11 @@ def receive_telemetry():
                                         telemetry_data['bandwidth_mode'] = 'low'
                                     else:
                                         telemetry_data['bandwidth_mode'] = 'normal'
+                                
+                                # Add orbital information if not present
+                                if 'orbit_angle' in telemetry_data:
+                                    # Convert orbit angle to percentage 
+                                    telemetry_data['orbit_percentage'] = (telemetry_data['orbit_angle'] / (2 * math.pi)) * 100
                                 
                                 # Store in recent history
                                 recent_telemetry.append(telemetry_data)

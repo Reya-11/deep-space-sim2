@@ -9,27 +9,30 @@ class Spacecraft:
     def __init__(self, spacecraft_id):
         self.spacecraft_id = spacecraft_id
         
-        # Initial position in meters
-        # Set the spacecraft far into deep space (1-5 light-years away)
-        light_year = 9.461e15  # meters
+        # Constants
+        self.AU = 149597870.7  # km
         
-        # Random direction from Earth
-        direction = np.random.rand(3)
-        direction = direction / np.linalg.norm(direction)  # Normalize to unit vector
+        # Orbital parameters (semi-major axis, eccentricity, inclination, etc.)
+        self.semi_major_axis = random.uniform(0.5, 1.2) * self.AU  # km
+        self.eccentricity = random.uniform(0.1, 0.3)  # 0=circle, <1=ellipse
+        self.inclination = random.uniform(-10, 10) * math.pi / 180  # radians (converts degrees to radians)
         
-        # Random distance between 1-5 light-years
-        distance = np.random.uniform(1, 5) * light_year
+        # Initial position in orbit
+        self.orbit_angle = random.uniform(0, 2 * math.pi)  # Starting position in orbit (radians)
+        self.orbit_period = 2 * math.pi * math.sqrt((self.semi_major_axis**3) / (3.98e13))  # Simplified period calculation
+        self.orbit_speed = 2 * math.pi / self.orbit_period  # radians per update
         
-        # Set initial position
-        self.position_x = direction[0] * distance
-        self.position_y = direction[1] * distance
-        self.position_z = direction[2] * distance
+        # Calculate initial position based on orbital parameters
+        self.position_x, self.position_y, self.position_z = self.calculate_position_from_orbit(self.orbit_angle)
         
-        # Very small velocity (realistic for deep space)
-        self.velocity_x = np.random.uniform(-1000, 1000)  # m/s
-        self.velocity_y = np.random.uniform(-1000, 1000)  # m/s
-        self.velocity_z = np.random.uniform(-1000, 1000)  # m/s
+        # Calculate velocity based on orbital mechanics
+        self.velocity_x, self.velocity_y, self.velocity_z = self.calculate_velocity_from_orbit(self.orbit_angle)
         
+        # Print initial position
+        print(f"[{spacecraft_id}] Initial position: {self.position_x/self.AU:.2f} AU, "
+              f"{self.position_y/self.AU:.2f} AU, {self.position_z/self.AU:.2f} AU from Mars")
+        
+        # Other spacecraft parameters
         self.temperature = random.uniform(-20, 20)
         self.energy_level = 100.0  # Percentage
         self.base_energy_drain = 0.01  # 0.01% drain per update cycle
@@ -40,16 +43,89 @@ class Spacecraft:
         
         # Simulation parameters
         self.energy_decay_rate = 0.1  # Energy percentage lost per cycle
+        self.orbit_anomaly_chance = 0.02  # 2% chance of orbital anomaly per update
+        self.last_anomaly_time = 0
+
+    def calculate_position_from_orbit(self, angle):
+        """Calculate 3D position from orbital parameters"""
+        # Calculate position in orbital plane
+        r = self.semi_major_axis * (1 - self.eccentricity**2) / (1 + self.eccentricity * math.cos(angle))
         
+        # Position in orbital plane
+        x_orbital = r * math.cos(angle)
+        y_orbital = r * math.sin(angle)
+        
+        # Apply inclination to get 3D position
+        x = x_orbital
+        y = y_orbital * math.cos(self.inclination)
+        z = y_orbital * math.sin(self.inclination)
+        
+        return x, y, z
+
+    def calculate_velocity_from_orbit(self, angle):
+        """Calculate velocity vector tangent to orbit"""
+        # Calculate position slightly ahead in orbit
+        delta_angle = 0.001
+        next_x, next_y, next_z = self.calculate_position_from_orbit(angle + delta_angle)
+        
+        # Calculate velocity vector (direction of motion)
+        vx = (next_x - self.position_x) / delta_angle
+        vy = (next_y - self.position_y) / delta_angle
+        vz = (next_z - self.position_z) / delta_angle
+        
+        # Scale to reasonable velocity (a few km/s)
+        magnitude = math.sqrt(vx**2 + vy**2 + vz**2)
+        scale = random.uniform(3, 7) / magnitude  # Target 3-7 km/s velocity
+        
+        return vx * scale, vy * scale, vz * scale
+
     def update_state(self):
         """Update spacecraft state"""
         # First execute any pending commands
         self.execute_commands()
         
-        # Update position based on velocity
-        self.position_x += self.velocity_x
-        self.position_y += self.velocity_y
-        self.position_z += self.velocity_z
+        # Store previous position for anomaly detection
+        prev_x, prev_y, prev_z = self.position_x, self.position_y, self.position_z
+        
+        # Regular orbit update
+        if random.random() > self.orbit_anomaly_chance:
+            # Regular orbital motion
+            self.orbit_angle += self.orbit_speed
+            if self.orbit_angle > 2 * math.pi:
+                self.orbit_angle -= 2 * math.pi  # Keep angle in [0, 2π]
+                
+            # Calculate new position based on orbit angle
+            self.position_x, self.position_y, self.position_z = self.calculate_position_from_orbit(self.orbit_angle)
+            
+            # Update velocity vector
+            self.velocity_x, self.velocity_y, self.velocity_z = self.calculate_velocity_from_orbit(self.orbit_angle)
+        else:
+            # Generate orbital anomaly (if enough time has passed since last one)
+            current_time = time.time()
+            if current_time - self.last_anomaly_time > 60:  # Limit anomalies to once per minute
+                print(f"[{self.spacecraft_id}] Orbital anomaly occurring!")
+                
+                # Create a deviation from expected orbit
+                deviation_factor = random.uniform(1.05, 1.2)  # 5-20% deviation
+                anomaly_type = random.choice(["position", "velocity"])
+                
+                if anomaly_type == "position":
+                    # Position anomaly (unexpected drift)
+                    self.position_x += self.velocity_x * deviation_factor
+                    self.position_y += self.velocity_y * deviation_factor
+                    self.position_z += self.velocity_z * deviation_factor
+                else:
+                    # Velocity anomaly (unexpected acceleration/deceleration)
+                    self.velocity_x *= deviation_factor
+                    self.velocity_y *= deviation_factor
+                    self.velocity_z *= deviation_factor
+                
+                self.last_anomaly_time = current_time
+            else:
+                # Standard update if anomaly is blocked by time limit
+                self.orbit_angle += self.orbit_speed
+                self.position_x, self.position_y, self.position_z = self.calculate_position_from_orbit(self.orbit_angle)
+                self.velocity_x, self.velocity_y, self.velocity_z = self.calculate_velocity_from_orbit(self.orbit_angle)
         
         # Update energy based on power budget
         power_budget = self.calculate_power_budget()
@@ -61,6 +137,17 @@ class Spacecraft:
         # Random radiation fluctuations
         self.radiation_level += random.uniform(-10, 10)
         
+        # Calculate position change for logging
+        delta_pos = math.sqrt(
+            (self.position_x - prev_x)**2 + 
+            (self.position_y - prev_y)**2 + 
+            (self.position_z - prev_z)**2
+        )
+        
+        # Log significant position changes
+        if delta_pos > 5000:  # This matches the position_change_max in edge_processing.py
+            print(f"[{self.spacecraft_id}] Large position change detected: {delta_pos:.2f} km")
+
     def execute_commands(self):
         """Execute commands from mission control"""
         if not self.command_queue:
@@ -113,56 +200,70 @@ class Spacecraft:
             print(f"[{self.spacecraft_id}] Ignoring command for {command.spacecraft_id}")
     
     def calculate_power_budget(self):
-        """Calculate current power budget"""
-        # Base power consumption
-        power_budget = {
-            "systems": {
-                "computer": 5.0,  # Watts
-                "comms": 15.0,    # Watts
-                "sensors": 8.0,   # Watts
-                "propulsion": 0.0,  # Watts, only used during maneuvers
-                "science": 0.0,    # Watts, only used during science operations
-                "heaters": 0.0     # Watts, variable based on temperature
-            },
-            "total_consumption": 0.0,
-            "solar_input": 0.0,
-            "net_power": 0.0
+        """Calculate power budget for spacecraft systems"""
+        # Define power consumption of various systems
+        power_consumption = {
+            "comms": 25,  # communication system
+            "scientific_instruments": 15,  # scientific instruments
+            "computer": 10,  # onboard computer
+            "navigation": 5,  # navigation systems
+            "thermal_control": 10,  # thermal control
+            "life_support": 0  # no life support in unmanned missions
         }
         
-        # Adjust based on mode
-        if self.mode == "SAFE":
-            power_budget["systems"]["comms"] = 5.0  # Reduced comms
-            power_budget["systems"]["sensors"] = 3.0  # Minimal sensors
-        elif self.mode == "SCIENCE":
-            power_budget["systems"]["science"] = 25.0  # Science instruments
-        elif self.mode == "COMMS":
-            power_budget["systems"]["comms"] = 30.0  # High-power transmission
-            
-        # Temperature-dependent heater power
-        if self.temperature < -10:
-            heater_power = 20.0
-            power_budget["systems"]["heaters"] = heater_power
-        elif self.temperature < 0:
-            heater_power = 10.0
-            power_budget["systems"]["heaters"] = heater_power
-            
-        # Calculate total consumption
-        total = sum(power_budget["systems"].values())
-        power_budget["total_consumption"] = total
+        # Position of Sun relative to Mars in km
+        sun_position_x = -1.5 * self.AU
+        sun_position_y = 0
+        sun_position_z = 0
+        
+        # Calculate distance from Sun
+        distance_from_sun_km = math.sqrt(
+            (self.position_x - sun_position_x)**2 + 
+            (self.position_y - sun_position_y)**2 + 
+            (self.position_z - sun_position_z)**2
+        )
+        
+        distance_from_sun_au = distance_from_sun_km / self.AU
         
         # Calculate solar input (decreases with square of distance from sun)
-        # Assume distance in AU is roughly position_z/100 for simplicity
-        distance_from_sun_au = abs(self.position_z/100) + 1  # Prevent division by zero
-        solar_constant = 1361  # W/m² at Earth
-        solar_panel_area = 10  # m²
-        solar_panel_efficiency = 0.3
-        solar_input = solar_constant * solar_panel_area * solar_panel_efficiency / (distance_from_sun_au ** 2)
-        power_budget["solar_input"] = solar_input
+        solar_constant = 1361  # W/m² at 1 AU
         
-        # Net power (positive means charging, negative means discharging)
-        power_budget["net_power"] = solar_input - total
+        # Adjust for distance from sun
+        solar_input = solar_constant / (distance_from_sun_au**2)
         
-        return power_budget
+        # Solar panel specs
+        panel_area = 15  # m²
+        panel_efficiency = 0.25  # 25% efficiency
+        
+        # Calculate solar panel output
+        solar_panel_output = solar_input * panel_area * panel_efficiency
+        
+        # Mode-specific power adjustments
+        if self.mode == "SAFE":
+            # Safe mode reduces power consumption
+            power_consumption["comms"] *= 0.5
+            power_consumption["scientific_instruments"] = 0  # Turn off science instruments
+        elif self.mode == "SCIENCE":
+            # Science mode increases instrument power
+            power_consumption["scientific_instruments"] *= 2
+        elif self.mode == "COMMS":
+            # Comms mode increases communication power
+            power_consumption["comms"] *= 2
+            power_consumption["scientific_instruments"] *= 0.5  # Reduce science power
+        
+        # Calculate total consumption
+        total_consumption = sum(power_consumption.values())
+        
+        # Net power (can be negative if consumption exceeds generation)
+        net_power = solar_panel_output - total_consumption
+        
+        return {
+            "solar_output": solar_panel_output,
+            "consumption": total_consumption,
+            "net_power": net_power,
+            "details": power_consumption,
+            "distance_from_sun_au": distance_from_sun_au
+        }
     
     def update_energy(self, power_budget):
         """Update energy levels based on power budget"""
@@ -211,6 +312,33 @@ class Spacecraft:
             mode=self.mode
         )
 
+    def send_telemetry(self):
+        """Send telemetry data to the edge processing service"""
+        try:
+            # Create telemetry data message
+            telemetry = space_telemetry_pb2.TelemetryData(
+                spacecraft_id=self.spacecraft_id,
+                timestamp=time.time(),
+                position_x=self.position_x,
+                position_y=self.position_y,
+                position_z=self.position_z,
+                velocity_x=self.velocity_x,
+                velocity_y=self.velocity_y,
+                velocity_z=self.velocity_z,
+                temperature=self.temperature,
+                radiation_level=self.radiation_level,
+                energy_level=self.energy_level,
+                mode=self.mode,
+                orbit_angle=self.orbit_angle
+            )
+            
+            # Send to edge processing service
+            response = self.telemetry_stub.SendTelemetry(telemetry)
+            print(f"[{self.spacecraft_id}] Telemetry sent. Response: {response.message}")
+            
+        except Exception as e:
+            print(f"[{self.spacecraft_id}] Error sending telemetry: {e}")
+
 def main():
     spacecraft = Spacecraft("Voyager-1")
     connection_attempts = 0
@@ -223,6 +351,7 @@ def main():
             
             # If we get here, connection succeeded
             print("[DATA] Successfully connected to Edge Processing server")
+            spacecraft.telemetry_stub = stub
             break
         except Exception as e:
             connection_attempts += 1

@@ -321,6 +321,36 @@ header h1 {
     stroke-width: 6px;
 }
 
+/* Refresh Info */
+.refresh-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 8px 15px;
+    background-color: #1a2659;
+    border-radius: 8px;
+    font-size: 0.9em;
+    color: #7dbcff;
+}
+
+.refresh-button {
+    background-color: #2a3a7c;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.refresh-button:hover {
+    background-color: #3a4a8c;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .charts-container, 

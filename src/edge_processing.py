@@ -402,7 +402,7 @@ class TelemetryProcessor(space_telemetry_pb2_grpc.TelemetryServiceServicer):
             'temperature_min': -50,
             'temperature_max': 50,
             'velocity_max': 15,  # m/s
-            'position_change_max': 50,  # max change between readings
+            'position_change_max': 5000,  # Increased to 5000 km (or even higher)
             'radiation_max': 1000  # example additional parameter
         }
         self.last_position = {}  # Track positions by spacecraft ID
@@ -468,7 +468,6 @@ class TelemetryProcessor(space_telemetry_pb2_grpc.TelemetryServiceServicer):
                 self.alert_levels[spacecraft_id] = "CRITICAL"
                 print(f"[EDGE] ALERT: Critical anomaly threshold reached for {spacecraft_id}!")
                 # Switch to critical bandwidth mode
-                self.bandwidth_mode = "critical"
             elif self.anomaly_count[spacecraft_id] > 2:
                 self.alert_levels[spacecraft_id] = "WARNING"
                 # Switch to low bandwidth mode
@@ -548,16 +547,29 @@ class TelemetryProcessor(space_telemetry_pb2_grpc.TelemetryServiceServicer):
         # Velocity check
         velocity = (telemetry.velocity_x**2 + telemetry.velocity_y**2 + telemetry.velocity_z**2)**0.5
         if velocity > self.thresholds['velocity_max']:
-            anomalies.append("Velocity exceeds maximum")
+            anomalies.append(f"Velocity exceeds maximum: {velocity:.2f} m/s")
         
         # Position change check
         if spacecraft_id in self.last_position:
             last_pos = self.last_position[spacecraft_id]
             position_change = ((telemetry.position_x - last_pos[0])**2 + 
-                            (telemetry.position_y - last_pos[1])**2 + 
-                            (telemetry.position_z - last_pos[2])**2)**0.5
+                              (telemetry.position_y - last_pos[1])**2 + 
+                              (telemetry.position_z - last_pos[2])**2)**0.5
+            
             if position_change > self.thresholds['position_change_max'] and sum(last_pos) != 0:
-                anomalies.append(f"Abnormal position change: {position_change:.2f}")
+                # Check which axis had the most significant change to identify orbit anomalies
+                x_change = abs(telemetry.position_x - last_pos[0])
+                y_change = abs(telemetry.position_y - last_pos[1])
+                z_change = abs(telemetry.position_z - last_pos[2])
+                
+                # Determine which axis had the largest change
+                max_change = max(x_change, y_change, z_change)
+                if max_change == x_change:
+                    anomalies.append(f"Orbit anomaly: Unexpected X-axis shift: {x_change:.2f}")
+                elif max_change == y_change:
+                    anomalies.append(f"Orbit anomaly: Unexpected Y-axis shift: {y_change:.2f}")
+                else:
+                    anomalies.append(f"Orbit anomaly: Unexpected Z-axis shift: {z_change:.2f}")
         
         # Radiation check if present
         if hasattr(telemetry, 'radiation_level') and telemetry.radiation_level > self.thresholds['radiation_max']:

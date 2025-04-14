@@ -14,11 +14,26 @@ message TelemetryData {
   double velocity_z = 8;
   double temperature = 9;
   
-  // New fields for enhanced simulation
+  // Existing fields
   double radiation_level = 10;
   double energy_level = 11;
   string mode = 12;          // NORMAL, SAFE, SCIENCE, COMMS, MAINTENANCE
   string alert_level = 13;   // NOMINAL, WARNING, CRITICAL
+  
+  // New orbital parameters
+  double orbit_angle = 14;    // Current position in orbit (radians)
+  
+  // Enhanced realism features
+  double doppler_shift = 15;           // Signal frequency change due to relative velocity
+  bool occultation = 16;               // Whether Mars is blocking line of sight
+  double bit_error_rate = 17;          // Error rate affected by radiation and distance
+  double signal_strength = 18;         // Signal strength considering distance and conditions
+  repeated string anomalies = 19;      // List of any anomalies detected
+  
+  // Spacecraft attitude (orientation)
+  double roll = 20;                    // Roll angle in degrees
+  double pitch = 21;                   // Pitch angle in degrees
+  double yaw = 22;                     // Yaw angle in degrees
 }
 
 // Command message from edge to spacecraft
