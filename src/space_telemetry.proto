@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package telemetry;
+
+message TelemetryData {
+  string spacecraft_id = 1;
+  double timestamp = 2;
+  double position_x = 3;
+  double position_y = 4;
+  double position_z = 5;
+  double velocity_x = 6;
+  double velocity_y = 7;
+  double velocity_z = 8;
+  double temperature = 9;
+  int32 anomaly_count = 10;
+  string anomaly_severity = 11;
+  string anomaly_descriptions = 12;
+  int32 decisions_made = 13;
+  string decisions_descriptions = 14;
+  bool sos_required = 15;
+  string sos_reason = 16;
+  
+  // Add these missing fields
+  double signal_quality = 17;
+  int32 sequence_num = 18;
+  bool anomaly_detected = 19;
+  double doppler_shift_hz = 20;
+  double carrier_freq_hz = 21;
+  string error_correction_type = 22;
+  int32 data_bytes = 23;
+  int32 parity_bytes = 24;
+  int32 error_correction_capability = 25;
+}
+
+service TelemetryService {
+  rpc SendTelemetry(TelemetryData) returns (TelemetryData) {}
+}

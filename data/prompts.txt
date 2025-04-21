@@ -1,0 +1,20 @@
+can you give me the entire codefile with these changes implemented?
+
+Would these changes cause any impact on the working of the other files aka receiver and data_stream?
+Does any of those need to be modified to accomodate the changes in edge_processing? If then, can you update them as well?
+
+How about the dashboard files?
+The dashboard does have a js and css file! You can read and update them as well!
+wowzees, thanks a bunch! I am open to any suggestions from you for improving this system!
+Oh yes, do elaborate!
+
+while your suggestion of having AI/ML models does help, I don't think our spacecrafts at this time have improved in being able to handle LLMs and AI models due to their hardware neccessities. That is why I wanted to avoid AI as much as possible for this system.
+I'll first implement the initial changes you recommended! By the way, for the system to work, do I need to modify the proto file by chance?
+
+in the initial files you provided to accomodate the changes made in edge_processing, I hope you kept the initial functionalities intact - like streaming data to the visualization, storing to db, etc. in receiver. Did you?
+can you give the entire updated code??
+what about preserving the original functionalities in other files --- receiver, data_stream, edge_processing, and dashboard?
+
+//till this point the system runs successfully/.
+
+wait, there has been a problem! The dashboard seems to have received data from receiver but is not broadcasting it, the webpage remains the same!

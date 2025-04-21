@@ -37,7 +37,7 @@ class TelemetryServiceStub(object):
         self.SendTelemetry = channel.unary_unary(
                 '/telemetry.TelemetryService/SendTelemetry',
                 request_serializer=space__telemetry__pb2.TelemetryData.SerializeToString,
-                response_deserializer=space__telemetry__pb2.TelemetryResponse.FromString,
+                response_deserializer=space__telemetry__pb2.TelemetryData.FromString,
                 _registered_method=True)
 
 
@@ -56,7 +56,7 @@ def add_TelemetryServiceServicer_to_server(servicer, server):
             'SendTelemetry': grpc.unary_unary_rpc_method_handler(
                     servicer.SendTelemetry,
                     request_deserializer=space__telemetry__pb2.TelemetryData.FromString,
-                    response_serializer=space__telemetry__pb2.TelemetryResponse.SerializeToString,
+                    response_serializer=space__telemetry__pb2.TelemetryData.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -85,7 +85,7 @@ class TelemetryService(object):
             target,
             '/telemetry.TelemetryService/SendTelemetry',
             space__telemetry__pb2.TelemetryData.SerializeToString,
-            space__telemetry__pb2.TelemetryResponse.FromString,
+            space__telemetry__pb2.TelemetryData.FromString,
             options,
             channel_credentials,
             insecure,

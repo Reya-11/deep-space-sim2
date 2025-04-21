@@ -1,77 +1,286 @@
-<!-- dashboard/templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Telemetry Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.11.4/chartist.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Deep Space Communication Dashboard</title>
+    
+    <!-- CSS first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Cesium.js"></script>
+
+    <!-- Optional: Add this for token management -->
+    <script>
+        // You can get a free token at https://cesium.com/ion/tokens
+        // For basic usage you can use this default token, but for production get your own
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMWZiLTQzYjYtYTQ0OS1kMWFjYmFkNjc5YzciLCJpZCI6NTc3MzMsImlhdCI6MTYyNzg0NTE4Mn0.XcKpgANiY19MC4bdFUXMVEBToBmqS8kuYpUlxJHYZxk';
+    </script>
 </head>
 <body>
-    <div class="dashboard">
-        <header>
-            <h1><i class="fas fa-satellite"></i> Space Telemetry Dashboard</h1>
-            <div class="spacecraft-info">
-                <span>Spacecraft: </span>
-                <span id="spacecraft-id">-</span>
-            </div>
-        </header>
+    <nav class="navbar navbar-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">Deep Space Communication System</span>
+            <span id="mission-timestamp" class="text-light">Mission Time: 00:00:00</span>
+        </div>
+    </nav>
+
+    <div class="container dashboard">
+        <!-- Alerts Section -->
+        <div id="alerts-container"></div>
         
-        <div class="metrics-container">
-            <div class="metric-card">
-                <div class="metric-icon">
-                    <i class="fas fa-mountain"></i>
+        <!-- Add Spacecraft Operations Section -->
+        <div class="d-flex justify-content-between mb-3">
+            <h4>Spacecraft Operations</h4>
+            <button id="pause-button" class="btn btn-warning">
+                <i class="bi bi-pause-fill"></i> Pause Spacecraft
+            </button>
+        </div>
+        
+        <!-- Main Dashboard -->
+        <div class="row">
+            <!-- Left Column - Spacecraft Status -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Spacecraft Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="system-status">
+                            <div id="spacecraft-status-indicator" class="status-indicator status-good"></div>
+                            <span id="spacecraft-status">Nominal</span>
+                        </div>
+                        
+                        <h6>Power System</h6>
+                        <div class="progress mb-3">
+                            <div id="power-level-bar" class="progress-bar bg-success" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">85%</div>
+                        </div>
+                        
+                        <h6>Signal Quality</h6>
+                        <div class="progress mb-3">
+                            <div id="signal-quality-bar" class="progress-bar bg-info" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                        </div>
+                        
+                        <h6>Current Mode</h6>
+                        <p id="spacecraft-mode" class="value-display">NORMAL OPERATION</p>
+                        
+                        <h6>Last Telemetry Update</h6>
+                        <p id="last-update-time" class="value-display">--</p>
+                    </div>
                 </div>
-                <div class="metric-data">
-                    <h3>Altitude</h3>
-                    <div class="metric-value" id="altitude">- km</div>
+                
+                <!-- Communication Stats Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Communication Stats</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <h6>Packets Sent</h6>
+                                <p id="packets-sent" class="value-display">0</p>
+                            </div>
+                            <div class="col-6">
+                                <h6>Packets Received</h6>
+                                <p id="packets-received" class="value-display">0</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <h6>Packets Lost</h6>
+                                <p id="packets-lost" class="value-display">0</p>
+                            </div>
+                            <div class="col-6">
+                                <h6>Loss Rate</h6>
+                                <p id="packet-loss-rate" class="value-display">0%</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h6>Data Volume</h6>
+                                <p id="data-volume" class="value-display">0 KB</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h6>Signal Delay</h6>
+                                <p id="signal-delay" class="value-display">0.0 seconds</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="metric-card">
-                <div class="metric-icon">
-                    <i class="fas fa-tachometer-alt"></i>
+            <!-- Center Column - Telemetry Charts -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Telemetry Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs" id="telemetryTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="position-tab" data-bs-toggle="tab" data-bs-target="#position" type="button">Position</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="velocity-tab" data-bs-toggle="tab" data-bs-target="#velocity" type="button">Velocity</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="temperature-tab" data-bs-toggle="tab" data-bs-target="#temperature" type="button">Temperature</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="signal-tab" data-bs-toggle="tab" data-bs-target="#signal" type="button">Signal</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content pt-3" id="telemetryTabContent">
+                            <div class="tab-pane fade show active" id="position" role="tabpanel">
+                                <div class="chart-container">
+                                    <canvas id="positionChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="velocity" role="tabpanel">
+                                <div class="chart-container">
+                                    <canvas id="velocityChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="temperature" role="tabpanel">
+                                <div class="chart-container">
+                                    <canvas id="temperatureChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="signal" role="tabpanel">
+                                <div class="chart-container">
+                                    <canvas id="signalQualityChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="metric-data">
-                    <h3>Velocity</h3>
-                    <div class="metric-value" id="velocity">- m/s</div>
+                
+                <!-- 3D Spacecraft Visualization -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>3D Spacecraft Visualization</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="spacecraft-3d" class="visualization-container"></div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="metric-card">
-                <div class="metric-icon">
-                    <i class="fas fa-thermometer-half"></i>
+                
+                <!-- Add new card for space weather -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Space Weather</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-6">Solar Activity:</div>
+                            <div class="col-6" id="solar-activity">Normal</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6">Radiation Alert:</div>
+                            <div class="col-6" id="radiation-alert">No</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6">Comm Impact:</div>
+                            <div class="col-6" id="weather-comm-impact">None</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="metric-data">
-                    <h3>Temperature</h3>
-                    <div class="metric-value" id="temperature">- °C</div>
+                
+                <!-- Add spacecraft selector dropdown -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Spacecraft Selection</h5>
+                    </div>
+                    <div class="card-body">
+                        <select id="spacecraft-selector" class="form-select">
+                            <option value="">Loading spacecraft...</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="charts-container">
-            <div class="chart-card">
-                <h3>Velocity Over Time</h3>
-                <div class="chart" id="velocity-chart"></div>
-            </div>
-            <div class="chart-card">
-                <h3>Temperature Over Time</h3>
-                <div class="chart" id="temperature-chart"></div>
-            </div>
-        </div>
-        
-        <div class="position-container">
-            <h3>Spacecraft Position</h3>
-            <div id="position-visualization">
-                <canvas id="position-canvas" width="400" height="400"></canvas>
+                
+                
+                <!-- Anomaly Log -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0" id="mission-log-title">Mission Log</h5>
+                    </div>
+                    <div class="card-body" style="max-height: 200px; overflow-y: auto;">
+                        <table class="table table-sm table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Spacecraft</th>
+                                    <th>Level</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody id="anomaly-log">
+                                <!-- Anomalies will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Add this after your Anomalies card -->
+                <div class="card mb-3">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="card-title mb-0" id="decisions-title">Autonomous Decisions</h5>
+                    </div>
+                    <div class="card-body" style="max-height: 200px; overflow-y: auto;">
+                        <table class="table table-sm table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Spacecraft</th>
+                                    <th>Decision</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody id="autonomous-decisions">
+                                <!-- Autonomous decisions will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    
+    <div class="modal fade" id="sos-modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-danger text-white">
+                <div class="modal-header">
+                    <h5 class="modal-title">🚨 SOS - OPERATOR INTERVENTION REQUIRED</h5>
+                </div>
+                <div class="modal-body">
+                    <p class="h4" id="sos-reason">Critical situation detected</p>
+                    <p>Immediate operator action required.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Acknowledge</button>
+                    <button type="button" class="btn btn-warning" onclick="openControlPanel()">Open Control Panel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <audio id="sos-alert-sound" src="/static/sounds/alert.mp3" preload="auto"></audio>
+    
+    <!-- ALL scripts at the bottom in correct dependency order -->
+    
+    <!-- Third-party libraries first -->
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0/dist/chartjs-adapter-luxon.min.js"></script>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Cesium.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.11.4/chartist.min.js"></script>
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <!-- Your application scripts last -->
+    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/spacecraft-cesium.js"></script>
 </body>
 </html>

@@ -1,11 +1,5 @@
 syntax = "proto3";
 
-package telemetry;
-
-service TelemetryService {
-  rpc SendTelemetry(TelemetryData) returns (TelemetryResponse);
-}
-
 message TelemetryData {
   string spacecraft_id = 1;
   double timestamp = 2;
@@ -16,8 +10,34 @@ message TelemetryData {
   double velocity_y = 7;
   double velocity_z = 8;
   double temperature = 9;
+  
+  // New fields for enhanced features
+  
+  // Power system data
+  double power_level = 10;        // Current power level (0-100%)
+  string power_mode = 11;         // Current power mode (normal, low_power, safe)
+  
+  // Signal information
+  double signal_strength = 12;    // Signal strength in dBm
+  double signal_quality = 13;     // Signal quality (0-100%)
+  double signal_delay = 14;       // One-way light time in seconds
+  
+  // Spacecraft status
+  string spacecraft_mode = 15;    // Current spacecraft mode (e.g., normal, safe_mode)
+  bool anomaly_detected = 16;     // Whether an anomaly has been detected
+  string anomaly_type = 17;       // Type of anomaly if detected
+  
+  // Transmission metadata
+  uint32 sequence_number = 18;    // Packet sequence number for detecting losses
+  uint32 checksum = 19;           // Checksum for data integrity
+  bool retransmission = 20;       // Whether this is a retransmission of lost data
+  double compression_ratio = 21;  // Compression ratio applied (1.0 = no compression)
 }
 
-message TelemetryResponse {
-  string status = 1;
+// Optional: Define a service for health status
+service TelemetryService {
+  rpc SendTelemetry (TelemetryData) returns (TelemetryData) {}
+  
+  // Additional methods if needed:
+  // rpc RequestStatus (StatusRequest) returns (StatusResponse) {}
 }

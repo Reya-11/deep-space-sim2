@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spacecraft Control Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-light">
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h4>🚨 Emergency Control Panel</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5>Direct Spacecraft Control</h5>
+                        <div class="alert alert-warning">
+                            Warning: These controls override autonomous systems
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header">Power Systems</div>
+                                    <div class="card-body">
+                                        <button class="btn btn-primary mb-2 w-100">Reset Power Systems</button>
+                                        <button class="btn btn-warning mb-2 w-100">Enter Low Power Mode</button>
+                                        <button class="btn btn-danger mb-2 w-100">Emergency Power Off</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header">Propulsion</div>
+                                    <div class="card-body">
+                                        <button class="btn btn-primary mb-2 w-100">Execute Orbital Correction</button>
+                                        <button class="btn btn-warning mb-2 w-100">Kill Thrust</button>
+                                        <button class="btn btn-danger mb-2 w-100">Emergency Deorbit</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div class="card mb-3">
+                                    <div class="card-header">Safe Mode Options</div>
+                                    <div class="card-body">
+                                        <button class="btn btn-success mb-2">Restore Normal Operations</button>
+                                        <button class="btn btn-warning mb-2">Diagnostics Mode</button>
+                                        <button class="btn btn-danger mb-2">Safe Mode (Minimal Systems)</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // This would be connected to real control APIs in a production system
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function() {
+                alert('Command sent: ' + this.textContent);
+            });
+        });
+    </script>
+</body>
+</html>
